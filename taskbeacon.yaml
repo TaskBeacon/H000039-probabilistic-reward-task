@@ -1,0 +1,28 @@
+id: H000039
+slug: probabilistic-reward-task
+title: Probabilistic Reward Task
+acquisition: behavior
+variant: html
+short_description: Browser companion for the Chinese probabilistic reward task with short/long mouth discrimination and deferred reward carryover
+cognitive_domain:
+  - reward-processing
+  - anhedonia
+  - signal-detection
+  - reinforcement-learning
+maturity: prototype
+version:
+  release_tag: v0.1.0-dev
+contracts:
+  psyflow_taps: v0.1.0
+evidence:
+  - README.md
+  - config/config.yaml
+  - main.ts
+  - src/run_trial.ts
+  - src/utils.ts
+  - assets/README.md
+  - assets/instruction_text_voice.mp3
+  - .github/workflows/notify-psyflow-web.yml
+  - references/alignment-matrix.md
+  - references/validation-checklist.md
+maintainer: []

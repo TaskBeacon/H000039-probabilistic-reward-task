@@ -1,0 +1,211 @@
+subinfo_fields:
+  - name: subject_id
+    type: int
+    constraints:
+      min: 101
+      max: 999
+      digits: 3
+subinfo_mapping:
+  subject_id: 被试编号（3位）
+  Participant Information: 被试信息
+  registration_failed: 注册失败
+  registration_successful: 注册成功
+  invalid_input: '{field} 输入无效'
+window:
+  size:
+    - 1280
+    - 720
+  units: pix
+  screen: 0
+  bg_color: black
+  fullscreen: false
+  monitor_width_cm: 35.5
+  monitor_distance_cm: 60
+task:
+  task_name: probabilistic_reward_task
+  save_path: ./outputs/html
+  language: Chinese
+  voice_name: zh-CN-YunyangNeural
+  voice_enabled: false
+  total_blocks: 3
+  total_trials: 300
+  trial_per_block: 100
+  conditions:
+    - prt
+  key_list:
+    - f
+    - j
+    - space
+  short_key: f
+  long_key: j
+  reward_win: 5
+  reward_loss: 0
+  practice_trials: 2
+  response_timeout_sec: 2.5
+  seed_mode: same_across_sub
+  overall_seed: 39039
+  block_seed:
+    - 39039
+    - 39040
+    - 39041
+  rich_reward_trials: 30
+  lean_reward_trials: 10
+  counterbalance_policy: subject_id_mod_4
+timing:
+  practice_fixation_duration: 0.5
+  pre_face_duration: 0.5
+  mouth_flash_duration: 0.1
+  response_duration: 2.5
+  reward_feedback_duration: 1.75
+  practice_feedback_duration: 1.75
+  iti_duration: 0.5
+  block_break_duration: 30.0
+stimuli:
+  fixation:
+    type: text
+    font: SimHei
+    text: +
+    color: white
+    height: 44
+  instruction_text:
+    type: text
+    font: SimHei
+    text: |
+      你将看到一个卡通脸，并判断嘴巴是“短”还是“长”。
+
+      按 {short_key} 选择“短”，按 {long_key} 选择“长”。
+
+      有些正确试次会得到奖励反馈，每次奖励为 +{reward_win} 分。
+
+      先完成 2 个练习试次。
+
+      按空格键开始。
+    color: white
+    height: 28
+    wrapWidth: 1000
+  face_outline:
+    type: circle
+    pos:
+      - 0
+      - 0
+    radius: 110
+    lineColor: white
+    lineWidth: 4
+    fillColor: black
+  eye_left:
+    type: circle
+    pos:
+      - -32
+      - 26
+    radius: 6
+    lineColor: white
+    lineWidth: 1
+    fillColor: white
+  eye_right:
+    type: circle
+    pos:
+      - 32
+      - 26
+    radius: 6
+    lineColor: white
+    lineWidth: 1
+    fillColor: white
+  mouth_short:
+    type: line
+    start:
+      - -20.5
+      - -30
+    end:
+      - 20.5
+      - -30
+    lineColor: white
+    lineWidth: 4
+  mouth_long:
+    type: line
+    start:
+      - -23.5
+      - -30
+    end:
+      - 23.5
+      - -30
+    lineColor: white
+    lineWidth: 4
+  practice_feedback_correct:
+    type: text
+    font: SimHei
+    text: 正确
+    color: green
+    height: 40
+  practice_feedback_incorrect:
+    type: text
+    font: SimHei
+    text: 错误
+    color: orange
+    height: 40
+  reward_feedback:
+    type: text
+    font: SimHei
+    text: |
+      正确！你赢得 {reward_delta} 分
+
+      当前总分：{total_score}
+    color: green
+    height: 38
+    wrapWidth: 980
+  block_break:
+    type: text
+    font: SimHei
+    text: |
+      区块 {block_num}/{total_blocks}
+
+      请休息 {break_seconds} 秒
+
+      当前总分：{total_score}
+    color: white
+    height: 28
+    wrapWidth: 980
+  good_bye:
+    type: text
+    font: SimHei
+    text: |
+      任务结束，最终总分：{total_score}
+
+      按空格键退出
+    color: white
+    height: 30
+    wrapWidth: 980
+triggers:
+  map:
+    exp_onset: 1
+    exp_end: 2
+    block_onset: 10
+    block_end: 11
+    practice_onset: 12
+    practice_end: 13
+    pre_face_onset: 20
+    face_preview_onset: 21
+    mouth_flash_onset: 22
+    response_onset: 30
+    short_response: 31
+    long_response: 32
+    response_timeout: 33
+    reward_feedback_onset: 40
+    neutral_feedback_onset: 41
+    iti_onset: 50
+  driver:
+    type: serial_url
+    url: loop://
+    baudrate: 115200
+  timing:
+    post_delay_ms: 1
+  policy:
+    strict: false
+condition_generation:
+  stimulus_types:
+    - short
+    - long
+  rich_reward_trials: 30
+  lean_reward_trials: 10
+  counterbalance_policy: subject_id_mod_4
+  no_response_policy: random
+  practice_trials: 2
