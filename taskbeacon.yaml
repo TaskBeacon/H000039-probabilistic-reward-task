@@ -13,7 +13,7 @@ maturity: prototype
 version:
   release_tag: v0.1.0-dev
 contracts:
-  taps: v0.1.0
+  taps: v0.2.0
 evidence:
   - README.md
   - config/config.yaml
@@ -26,3 +26,5 @@ evidence:
   - references/alignment-matrix.md
   - references/validation-checklist.md
 maintainer: []
+runtime:
+  profile: web
