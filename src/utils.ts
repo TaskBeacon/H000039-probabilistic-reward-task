@@ -1,5 +1,3 @@
-import type { TaskSettings } from "psyflow-web";
-
 export type StimulusType = "short" | "long";
 export type RewardRole = "rich" | "lean" | "none" | "practice";
 
@@ -37,16 +35,6 @@ export type PRTTrialSummary = {
   log_b: number;
   log_d: number;
 };
-
-type SettingsLike = TaskSettings & Record<string, unknown>;
-
-function hashString(input: string): number {
-  let hash = 0;
-  for (let index = 0; index < input.length; index += 1) {
-    hash = (hash * 31 + input.charCodeAt(index)) >>> 0;
-  }
-  return hash;
-}
 
 function makeSeededRandom(seed: number): () => number {
   let value = seed >>> 0;

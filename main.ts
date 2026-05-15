@@ -8,7 +8,9 @@ import {
   parsePsyflowConfig,
   reset_trial_counter,
   set_trial_context,
-  type CompiledTrial
+  type CompiledTrial,
+  type RuntimeView,
+  type TrialSnapshot
 } from "psyflow-web";
 
 import { runTrial } from "./src/run_trial";
@@ -113,7 +115,7 @@ function createBlockBreakTrial(
     condition: "block_break"
   });
   let loggedSummary = false;
-  const unit = trial.unit("block_break").addStim((_, runtime) => {
+  const unit = trial.unit("block_break").addStim((_snapshot: TrialSnapshot, runtime: RuntimeView) => {
     if (!loggedSummary) {
       const blockRows = runtime
         .getReducedRows()
@@ -162,7 +164,7 @@ function createGoodbyeTrial(
     trial_index: totalTrials,
     condition: "good_bye"
   });
-  const unit = trial.unit("good_bye").addStim((_, runtime) =>
+  const unit = trial.unit("good_bye").addStim((_snapshot: TrialSnapshot, _runtime: RuntimeView) =>
     stimBank.get_and_format("good_bye", {
       total_score: rewardTracker.peek()
     })
@@ -206,6 +208,15 @@ function buildTrials(
   rewardTracker: RewardTracker
 ): CompiledTrial[] {
   reset_trial_counter();
+
+  const subjectId = coerceSubjectId(settings.subject_id);
+  const balance = resolve_counterbalance(subjectId);
+  settings.short_key = balance.short_key;
+  settings.long_key = balance.long_key;
+  settings.rich_stimulus = balance.rich_stimulus;
+  settings.counterbalance_id = balance.counterbalance_id;
+  settings.short_key_label = balance.short_key.toUpperCase();
+  settings.long_key_label = balance.long_key.toUpperCase();
 
   const totalBlocks = Math.max(1, Number(settings.total_blocks ?? 1));
   const trialsPerBlock = Math.max(1, Number(settings.trials_per_block ?? settings.trial_per_block ?? 1));
@@ -314,19 +325,7 @@ export async function main(root: HTMLElement): Promise<unknown> {
 
   const subInfo = new SubInfo(parsed.subform_config);
   const stimBank = new StimBank(parsed.stim_config);
-  const subjectData = subInfo.collect();
-  const subjectId = coerceSubjectId(subjectData.subject_id);
-  const balance = resolve_counterbalance(subjectId);
   const rewardTracker = new RewardTracker(0);
-
-  settingsView.short_key = balance.short_key;
-  settingsView.long_key = balance.long_key;
-  settingsView.rich_stimulus = balance.rich_stimulus;
-  settingsView.counterbalance_id = balance.counterbalance_id;
-  settingsView.short_key_label = balance.short_key.toUpperCase();
-  settingsView.long_key_label = balance.long_key.toUpperCase();
-
-  settings.add_subinfo(subjectData);
 
   if (Boolean(settingsView.voice_enabled)) {
     const voiceName =

@@ -1,4 +1,4 @@
-import { TrialBuilder, set_trial_context, type StimBank, type TaskSettings } from "psyflow-web";
+import { TrialBuilder, set_trial_context, type RuntimeView, type StimBank, type TaskSettings, type TrialSnapshot } from "psyflow-web";
 
 import {
   build_condition_id,
@@ -316,12 +316,12 @@ export function runTrial(
     stim_id: "face_outline+eye_left+eye_right"
   });
   response.set_state({
-    response_key: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).response_key,
-    response_raw_key: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).response_raw_key,
-    response_correct: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).response_correct,
-    choice_timeout: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).choice_timeout,
-    choice_forced: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).choice_forced,
-    choice_rt: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).choice_rt,
+    response_key: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).response_key,
+    response_raw_key: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).response_raw_key,
+    response_correct: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).response_correct,
+    choice_timeout: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).choice_timeout,
+    choice_forced: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).choice_forced,
+    choice_rt: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).choice_rt,
     correct_key: correctKey
   });
   response.captureResponse({
@@ -333,7 +333,7 @@ export function runTrial(
   });
 
   if (trialKind === "practice") {
-    const practiceFeedback = trial.unit(feedbackPhase).addStim((snapshot, runtime) => {
+    const practiceFeedback = trial.unit(feedbackPhase).addStim((snapshot: TrialSnapshot, _runtime: RuntimeView) => {
       const outcome = getOutcome(snapshot as Record<string, any>);
       return options.stimBank.get(
         outcome.response_correct ? "practice_feedback_correct" : "practice_feedback_incorrect"
@@ -358,14 +358,14 @@ export function runTrial(
       stim_id: "practice_feedback_correct"
     });
     practiceFeedback.set_state({
-      practice_correct: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).response_correct,
+      practice_correct: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).response_correct,
       reward_delivered: false,
       reward_delta: 0,
       total_score: options.rewardTracker.peek()
     });
     practiceFeedback.show({ duration: practiceFeedbackDuration });
   } else {
-    const experimentalFeedback = trial.unit(feedbackPhase).addStim((snapshot, runtime) => {
+    const experimentalFeedback = trial.unit(feedbackPhase).addStim((snapshot: TrialSnapshot, _runtime: RuntimeView) => {
       const outcome = getOutcome(snapshot as Record<string, any>);
       if (outcome.reward_delivered) {
         return options.stimBank.get_and_format("reward_feedback", {
@@ -394,11 +394,11 @@ export function runTrial(
       stim_id: "reward_feedback"
     });
     experimentalFeedback.set_state({
-      reward_delivered: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).reward_delivered,
-      reward_delta: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).reward_delta,
-      total_score: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).total_score,
-      pending_before: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).pending_before,
-      pending_after: (snapshot, runtime) => getOutcome(snapshot as Record<string, any>).pending_after
+      reward_delivered: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).reward_delivered,
+      reward_delta: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).reward_delta,
+      total_score: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).total_score,
+      pending_before: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).pending_before,
+      pending_after: (snapshot: TrialSnapshot, _runtime: RuntimeView) => getOutcome(snapshot as Record<string, any>).pending_after
     });
     experimentalFeedback.show({ duration: rewardFeedbackDuration });
   }
@@ -424,13 +424,13 @@ export function runTrial(
   });
   iti.show({ duration: itiDuration });
 
-  trial.finalize((snapshot, runtime, helpers) => {
+  trial.finalize((snapshot, _runtime, helpers) => {
     const outcome = getOutcome(snapshot as Record<string, any>);
     const finalOutcome =
       trialKind === "experimental"
         ? {
             ...outcome,
-            ...rewardTracker.update_trial({
+            ...options.rewardTracker.update_trial({
               stimulus_type: condition.stimulus_type,
               reward_due: condition.reward_due,
               is_correct: outcome.response_correct,
